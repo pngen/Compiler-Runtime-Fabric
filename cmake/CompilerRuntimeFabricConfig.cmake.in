@@ -1,0 +1,17 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# Compiler Runtime Fabric has no third-party build dependencies. On Windows the
+# runtime core uses the Win32 process and file APIs directly.
+if(WIN32)
+  set(CRF_WINDOWS_BACKEND TRUE)
+else()
+  set(CRF_WINDOWS_BACKEND FALSE)
+  set(CompilerRuntimeFabric_UNSUPPORTED_REASON
+      "Compiler Runtime Fabric 1.0.0 ships a Windows process backend only")
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/CompilerRuntimeFabricTargets.cmake")
+
+check_required_components(CompilerRuntimeFabric)

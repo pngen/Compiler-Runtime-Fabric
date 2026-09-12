@@ -1,0 +1,43 @@
+# Build trees
+/build/
+/build-*/
+/out/
+/install/
+/asan/
+/_deps/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+*.cmake.stamp
+
+# Compiler workspaces and scratch
+/.crf-workspaces/
+*.crf-workspace
+*.obj
+*.o
+*.exe
+*.dll
+*.lib
+*.exp
+*.pdb
+*.ilk
+*.res
+
+# Persistence scratch
+*.crfjournal
+*.crfsnapshot
+*.crfdb
+
+# Logs
+*.log
+
+# Editor
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo

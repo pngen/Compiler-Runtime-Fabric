@@ -1,0 +1,4 @@
+add_executable(crf_bench bench_runtime.cpp)
+target_link_libraries(crf_bench PRIVATE crf_core crf_adapters)
+crf_apply_strict_options(crf_bench)
+crf_enable_asan(crf_bench)

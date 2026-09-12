@@ -1,0 +1,23 @@
+#pragma once
+
+// Generated from include/crf/version.hpp.in by the Compiler Runtime Fabric
+// build. Do not edit the generated file.
+
+#define CRF_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define CRF_VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define CRF_VERSION_PATCH @PROJECT_VERSION_PATCH@
+#define CRF_VERSION_STRING "@PROJECT_VERSION@"
+
+namespace crf {
+
+inline constexpr int version_major = CRF_VERSION_MAJOR;
+inline constexpr int version_minor = CRF_VERSION_MINOR;
+inline constexpr int version_patch = CRF_VERSION_PATCH;
+inline constexpr const char* version_string = CRF_VERSION_STRING;
+
+/// Semantic version of the control-plane wire protocol. Independent of the
+/// library version: a 1.0.x patch release must not break a 1.0.y peer.
+inline constexpr unsigned protocol_version_major = 1;
+inline constexpr unsigned protocol_version_minor = 0;
+
+}  // namespace crf
