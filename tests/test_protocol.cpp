@@ -159,7 +159,10 @@ CRF_TEST(protocol_field_codec_rejects_duplicates_and_reordering) {
   CRF_EXPECT(rejected);
 
   CRF_PHASE("TRUNCATED_FIELD");
-  FieldReader truncated(payload.substr(0, payload.size() - 1));
+  // The damaged payload is a named object: a reader holds a view, so binding it
+  // to a temporary would leave the view dangling.
+  const std::string truncated_payload = payload.substr(0, payload.size() - 1);
+  FieldReader truncated(truncated_payload);
   bool truncated_rejected = false;
   for (;;) {
     const Result<bool> step = truncated.next();
@@ -172,7 +175,8 @@ CRF_TEST(protocol_field_codec_rejects_duplicates_and_reordering) {
   CRF_EXPECT(truncated_rejected);
 
   CRF_PHASE("TRAILING_BYTES");
-  FieldReader trailing(payload + std::string("\x01"));
+  const std::string trailing_payload = payload + std::string("\x01");
+  FieldReader trailing(trailing_payload);
   bool trailing_rejected = false;
   for (;;) {
     const Result<bool> step = trailing.next();

@@ -116,6 +116,22 @@ CRF_NODISCARD bool compile_and_link(Runtime& runtime, const std::string& source_
                     std::string(to_string(phase->state)).c_str(),
                     std::string(to_string(phase->last_status)).c_str(),
                     phase->last_detail.c_str());
+        // The compiler's own words are what make a refusal diagnosable.
+        const DiagnosticSet* captured =
+            phase->diagnostics.id.present()
+                ? runtime.diagnostics().find(phase->diagnostics.id)
+                : nullptr;
+        if (captured == nullptr) continue;
+        std::printf("    exit=%d stdout=%llu stderr=%llu truncated=%d\n", captured->exit_code,
+                    static_cast<unsigned long long>(captured->raw_stdout_bytes),
+                    static_cast<unsigned long long>(captured->raw_stderr_bytes),
+                    captured->truncated ? 1 : 0);
+        if (!captured->raw_stdout_tail.empty()) {
+          std::printf("    stdout: %s\n", captured->raw_stdout_tail.c_str());
+        }
+        if (!captured->raw_stderr_tail.empty()) {
+          std::printf("    stderr: %s\n", captured->raw_stderr_tail.c_str());
+        }
       }
     }
     std::printf("  outcome status=%s detail=%s\n", std::string(to_string(outcome.status)).c_str(),
