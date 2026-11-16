@@ -314,8 +314,12 @@ CRF_TEST(multiprocess_full_lifecycle_proof) {
   const std::filesystem::path heavy_a = sources / "multiprocess_heavy_a.cpp";
   const std::filesystem::path heavy_b = sources / "multiprocess_heavy_b.cpp";
   CRF_REQUIRE(crftest::write_text(simple_source, hello_source()));
-  CRF_REQUIRE(crftest::write_text(heavy_a, heavy_source(9000)));
-  CRF_REQUIRE(crftest::write_text(heavy_b, heavy_source(9000)));
+  // The proof kills the worker, and later retires the toolchain, while one of
+  // these compiles is in flight, then requires that the phase did not commit.
+  // At 9000 functions the compile took about 350 ms here, short enough for it to
+  // finish and commit before the action landed; 35000 take about 3 s.
+  CRF_REQUIRE(crftest::write_text(heavy_a, heavy_source(35000)));
+  CRF_REQUIRE(crftest::write_text(heavy_b, heavy_source(35000)));
   CRF_REQUIRE(std::filesystem::exists(tool_path("crf_coordinator")));
   CRF_REQUIRE(std::filesystem::exists(tool_path("crf_worker")));
 
