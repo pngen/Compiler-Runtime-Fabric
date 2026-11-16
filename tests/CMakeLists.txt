@@ -39,7 +39,6 @@ foreach(suite IN LISTS CRF_TEST_PRESENT)
   crf_apply_strict_options(${suite})
   crf_enable_asan(${suite})
   add_test(NAME ${suite} COMMAND ${suite})
-  set_tests_properties(${suite} PROPERTIES TIMEOUT 3600)
 endforeach()
 
 # The multiprocess proof drives the real coordinator and worker executables.

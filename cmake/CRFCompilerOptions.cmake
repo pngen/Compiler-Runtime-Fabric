@@ -32,8 +32,16 @@ function(crf_enable_asan target)
   if(MSVC)
     target_compile_options(${target} PRIVATE /fsanitize=address /Zi)
     target_link_options(${target} PRIVATE /INCREMENTAL:NO)
-    # ASan needs debug info at runtime; keep the PDB next to the binary.
-    target_compile_options(${target} PRIVATE $<IF:$<CONFIG:Debug>,/Od,/O1>)
+    # An instrumented executable loads the ASan runtime DLL. Processes started
+    # through the runtime's supervisor get a minimal PATH, so the DLL is placed
+    # next to every instrumented executable.
+    get_target_property(_crf_type ${target} TYPE)
+    get_filename_component(_crf_cl_dir "${CMAKE_CXX_COMPILER}" DIRECTORY)
+    set(_crf_asan_dll "${_crf_cl_dir}/clang_rt.asan_dynamic-x86_64.dll")
+    if(_crf_type STREQUAL "EXECUTABLE" AND EXISTS "${_crf_asan_dll}")
+      add_custom_command(TARGET ${target} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_crf_asan_dll}" "$<TARGET_FILE_DIR:${target}>")
+    endif()
   else()
     target_compile_options(${target} PRIVATE -fsanitize=address -fno-omit-frame-pointer)
     target_link_options(${target} PRIVATE -fsanitize=address)

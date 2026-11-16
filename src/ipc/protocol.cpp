@@ -574,8 +574,11 @@ Result<std::unique_ptr<ControlServer>> ControlServer::listen(ServerOptions optio
     return Status(StatusCode::protocol_io, "listener socket creation failed");
   }
   server->impl_->socket = socket;
-  BOOL reuse = TRUE;
-  ::setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char*>(&reuse), sizeof(reuse));
+  // SO_REUSEADDR on Windows lets a second socket bind a port that is still
+  // listening; exclusive use makes the second bind fail instead.
+  BOOL exclusive = TRUE;
+  ::setsockopt(socket, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, reinterpret_cast<const char*>(&exclusive),
+               sizeof(exclusive));
   sockaddr_in address{};
   address.sin_family = AF_INET;
   address.sin_port = ::htons(options.port);

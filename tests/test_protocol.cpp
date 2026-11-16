@@ -390,3 +390,20 @@ CRF_TEST(protocol_duplicate_completion_racing_for_one_phase_generation) {
   CRF_EXPECT(audit.value().zero_violations());
   CRF_EXPECT_OK(runtime.value()->shutdown());
 }
+
+CRF_TEST(protocol_second_listener_cannot_take_a_listening_port) {
+  CRF_PHASE("BIND");
+  ServerOptions options;
+  options.bind_address = "127.0.0.1";
+  const Result<std::unique_ptr<ControlServer>> first = ControlServer::listen(options);
+  CRF_REQUIRE_OK(first);
+  const std::uint16_t port = first.value()->port();
+  CRF_REQUIRE(port != 0);
+
+  CRF_PHASE("VERIFY");
+  // Two coordinators must never share one listening port.
+  ServerOptions same = options;
+  same.port = port;
+  const Result<std::unique_ptr<ControlServer>> second = ControlServer::listen(same);
+  CRF_EXPECT(!second);
+}
